@@ -11,10 +11,9 @@ package com.kaushalya.converter;
 public class Convertor extends javax.swing.JFrame {
 
     /**
-     * Creates new form Convertor 
-     * 
-     * Practical 07 
-     * Interpreter Pattern
+     * Creates new form Convertor
+     *
+     * Practical 07 Interpreter Pattern
      *
      * The interpreter pattern is a design pattern that specifies how to
      * evaluate sentences in a language. Write an interpreter to interpret text
@@ -26,6 +25,71 @@ public class Convertor extends javax.swing.JFrame {
      */
     public Convertor() {
         initComponents();
+    }
+
+    public class TerminalExpression implements Expression {
+
+        private int value;
+
+        public TerminalExpression(int value) {
+            this.value = value;
+        }
+
+        @Override
+        public int interpret() {
+            return this.value;
+        }
+    }
+
+    public class NonTerminalExpression implements Expression {
+
+        private Expression expression1;
+        private Expression expression2;
+
+        public NonTerminalExpression(Expression expression1, Expression expression2) {
+            this.expression1 = expression1;
+            this.expression2 = expression2;
+        }
+
+        @Override
+        public int interpret() {
+            // Here you can combine expressions based on your logic (e.g., addition, concatenation, etc.)
+            return expression1.interpret() + expression2.interpret();
+        }
+    }
+
+    // Helper method for number to word
+    private String convertToWord(int digit) {
+        String[] words = {"Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"};
+        return (digit >= 0 && digit <= 9) ? words[digit] : "";
+    }
+
+    // Helper method for word to number
+    private int parseWordToDigit(String word) {
+        switch (word.toLowerCase()) {
+            case "zero":
+                return 0;
+            case "one":
+                return 1;
+            case "two":
+                return 2;
+            case "three":
+                return 3;
+            case "four":
+                return 4;
+            case "five":
+                return 5;
+            case "six":
+                return 6;
+            case "seven":
+                return 7;
+            case "eight":
+                return 8;
+            case "nine":
+                return 9;
+            default:
+                return -1;
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -153,11 +217,45 @@ public class Convertor extends javax.swing.JFrame {
 
     // Number To Text Convert
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        String input = jTextField1.getText();
+        StringBuilder resultText = new StringBuilder();
 
+        if(input.isBlank()){
+            jLabel2.setText("Result : ..............................................");
+            return;
+        }
+        
+        for (char c : input.toCharArray()) {
+            if (Character.isDigit(c)) {
+                int digit = Character.getNumericValue(c);
+                Expression expr = new TerminalExpression(digit);
+                resultText.append(convertToWord(expr.interpret())).append(" ");
+            }
+        }
+
+        jLabel2.setText(resultText.toString().trim());
     }//GEN-LAST:event_jButton1ActionPerformed
+
     // Text To Number Convert
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        String input = jTextField2.getText(); // e.g., "Nine One Four"
+        String[] words = input.split(" ");
+        StringBuilder resultNum = new StringBuilder();
 
+         if(input.isBlank()){
+            jLabel3.setText("Result : ..............................................");
+            return;
+        }
+         
+        for (String word : words) {
+            int val = parseWordToDigit(word);
+            if (val != -1) {
+                Expression expr = new TerminalExpression(val);
+                resultNum.append(expr.interpret());
+            }
+        }
+        
+         jLabel3.setText(resultNum.toString());
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
